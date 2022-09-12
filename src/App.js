@@ -12,6 +12,7 @@ class App extends React.Component {
       vehicles: [],
       drivers: [],
       actualDriver: 1,
+      page: 0,
     };
 
     this.onSearchDrivers = this.onSearchDrivers.bind(this);
@@ -20,14 +21,18 @@ class App extends React.Component {
     this.onDelete = this.onDelete.bind(this);
     this.onLoad = this.onLoad.bind(this);
     this.reloadVehicles = this.reloadVehicles.bind(this);
+    this.showMore = this.showMore.bind(this);
   }
 
   async onSearchVehicles(driverID) {
-    await fetch(`http://localhost:3001/vehicles/${driverID}`)
+    await fetch(
+      `http://localhost:3001/vehicles/${driverID}?page=${this.state.page}`
+    )
       .then((response) => response.json())
       .then((data) => {
         this.setState({
-          vehicles: data,
+          vehicles: [...this.state.vehicles].concat(data),
+          page: this.state.page + 1,
         });
       })
       .catch((err) => {
@@ -68,23 +73,34 @@ class App extends React.Component {
 
   async onDelete(vehicleID) {
     await this.deleteCar(vehicleID);
-    await this.reloadVehicles()
+    await this.reloadVehicles();
   }
 
   onChangeDriver(e) {
     const driverID = e.target.value;
     this.setState({
       actualDriver: driverID,
+      page: 1,
+      vehicles: [],
     });
     this.onSearchVehicles(driverID);
   }
 
   async onLoad(e) {
-    await this.onSearchDrivers();
-    await this.onSearchVehicles(1);
     this.setState({
+      vehicles: [],
+      page: 0,
       actualDriver: 1,
     });
+    await this.onSearchDrivers();
+    await this.onSearchVehicles(1);
+  }
+
+  showMore() {
+    this.setState({
+      page: this.state.page + 1,
+    });
+    this.onSearchVehicles(this.state.actualDriver);
   }
 
   reloadVehicles() {
@@ -105,6 +121,7 @@ class App extends React.Component {
           vehicles={this.state.vehicles}
           onDelete={this.onDelete}
           reload={this.reloadVehicles}
+          showMore={this.showMore}
         />
       </div>
     );

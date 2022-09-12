@@ -45,7 +45,6 @@ class Table extends React.Component {
             <PanelUpdate
               drivers={this.props.drivers}
               onHide={this.onHide}
-              onUpdate={this.onUpdate}
               id={this.state.id}
               placa={this.state.plate}
               modelo={this.state.model}
@@ -92,6 +91,7 @@ class Table extends React.Component {
               ))}
             </tbody>
           </table>
+          <button className="button" onClick={this.props.showMore}>Cargar Mas</button>
         </div>
       </>
     );
